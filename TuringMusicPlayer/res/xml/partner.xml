@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- HE: 机器人APP必须按机器人OS要求的item声明应用信息，才能在机器人OS上被使用 -->
+<!-- HE: appKey与apk包名唯一绑定，未认证应用将无法在机器人OS上使用 -->
+
+<roboapp-info xmlns:launcher="http://schemas.android.com/apk/res-auto/com.turing.partner">
+    <item
+        functionCode="200101"
+        packageName="com.turing.musicplayer"
+        className="com.turing.musicplayer.CryService"
+        appKey="null"
+        />
+</roboapp-info>

@@ -1,0 +1,64 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#22888888"
+    tools:context="${relativePackage}.${activityClass}" >
+
+    <LinearLayout
+        android:id="@+id/ll_top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#bb888888" >
+
+        <TextView
+            android:id="@+id/start"
+            style="@style/styleMainText"
+            android:layout_width="0dip"
+            android:layout_weight="1"
+            android:layout_height="35dip"
+            android:text="启动" />
+        
+        <TextView
+            android:id="@+id/pause"
+            style="@style/styleMainText"
+            android:layout_width="0dip"
+            android:layout_weight="1"
+            android:layout_height="35dip"
+            android:text="暂停" />
+        
+
+        <TextView
+            android:id="@+id/previous"
+            style="@style/styleMainText"
+            android:layout_width="0dip"
+            android:layout_weight="1"
+            android:layout_height="35dip"
+            android:text="上一首" />
+        
+        <TextView
+            android:id="@+id/next"
+            style="@style/styleMainText"
+            android:layout_width="0dip"
+            android:layout_weight="1"
+            android:layout_height="35dip"
+            android:text="下一首" />
+        
+        <TextView
+            android:id="@+id/stop"
+            style="@style/styleMainText"
+            android:layout_width="0dip"
+            android:layout_weight="1"
+            android:layout_height="35dip"
+            android:text="停止" />
+    </LinearLayout>
+    
+    <ListView 
+        android:layout_below="@+id/ll_top"
+        android:id="@+id/listview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        ></ListView>
+
+</RelativeLayout>
