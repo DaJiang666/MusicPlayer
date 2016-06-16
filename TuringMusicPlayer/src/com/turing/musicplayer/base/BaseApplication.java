@@ -3,10 +3,10 @@ package com.turing.musicplayer.base;
 import com.turing.musicplayer.service.MusicService;
 import com.turing.musicplayer.util.Constants;
 
+import android.app.Application;
 import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
-import turing.os.app.TuringOsApplication;
 /**
  *
  *	Author: ZhangDanJiang
@@ -20,7 +20,8 @@ import turing.os.app.TuringOsApplication;
  *  通过此方法与OS系统进行通信，接收系统发来的JSON信息
  *
  */
-public class BaseApplication extends TuringOsApplication {
+public class BaseApplication extends Application {
+//	public class BaseApplication extends TuringOsApplication {
 
 	/** 当前类 TAG. 标示 */
 	private static final String TAG = BaseApplication.class.getSimpleName();
@@ -30,17 +31,17 @@ public class BaseApplication extends TuringOsApplication {
 	/** 服务是否开启 */
 	private boolean mIsStartService = false;
 
-	@Override
-	public void onEventReceived(int eventId, String eventData) {
-		if (DEBUG) {
-			Log.d(TAG, "onEventReceived .. eventId ==" + eventId + "eventData" + eventData);
-		}
-		// 判断应用是否为开启状态， 如果没有开启，开启音乐服务，并设置其状态为开启
-		if (!mIsStartService) {
-			startMusicService(eventId, eventData);
-			mIsStartService = true;
-		}
-	}
+//	@Override
+//	public void onEventReceived(int eventId, String eventData) {
+//		if (DEBUG) {
+//			Log.d(TAG, "onEventReceived .. eventId ==" + eventId + "eventData" + eventData);
+//		}
+//		// 判断应用是否为开启状态， 如果没有开启，开启音乐服务，并设置其状态为开启
+//		if (!mIsStartService) {
+//			startMusicService(eventId, eventData);
+//			mIsStartService = true;
+//		}
+//	}
 	
 	/**
 	 * 开启音乐服务
