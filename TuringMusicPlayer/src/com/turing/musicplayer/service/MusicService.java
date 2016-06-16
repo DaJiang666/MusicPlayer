@@ -2,7 +2,6 @@ package com.turing.musicplayer.service;
 
 import java.io.IOException;
 
-import com.alibaba.fastjson.JSONObject;
 import com.turing.musicplayer.R;
 import com.turing.musicplayer.model.EventDataBean;
 import com.turing.musicplayer.util.Constants;
