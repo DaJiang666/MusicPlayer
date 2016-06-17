@@ -3,6 +3,7 @@ package com.turing.musicplayer.manager;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.turing.musicplayer.interfaces.MusicConstantValue;
 import com.turing.musicplayer.model.MusicBean;
 import com.turing.musicplayer.util.Constants;
 
@@ -22,10 +23,15 @@ import android.provider.MediaStore;
  *
  */
 public final class MusicManager {
+	
 	/** debug开关 */
 	private static final boolean DEBUG = true & Constants.DEBUG;
 	/** TAG */
 	private static final String TAG = "MusicManager";
+	/** 当前播放的位置  */
+	public static int CURRENTPOS = 0;
+	/** 当前音乐播放的状态  */
+	public static int PLAYSTATE = MusicConstantValue.OPTION_PAUSE;
 	/** 单例 */
 	private static MusicManager instance = null;
 	/** Context */

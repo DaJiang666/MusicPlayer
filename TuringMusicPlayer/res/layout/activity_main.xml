@@ -52,6 +52,14 @@
             android:layout_weight="1"
             android:layout_height="35dip"
             android:text="停止" />
+        
+         <TextView
+            android:id="@+id/tv_continue"
+            style="@style/styleMainText"
+            android:layout_width="0dip"
+            android:layout_weight="1"
+            android:layout_height="35dip"
+            android:text="继续" />
     </LinearLayout>
     
     <ListView 

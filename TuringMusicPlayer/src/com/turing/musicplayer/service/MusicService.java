@@ -3,17 +3,18 @@ package com.turing.musicplayer.service;
 import java.io.IOException;
 
 import com.turing.musicplayer.R;
-import com.turing.musicplayer.model.EventDataBean;
+import com.turing.musicplayer.broad.MusicBroadCastReceiver;
+import com.turing.musicplayer.interfaces.MusicConstantValue;
+import com.turing.musicplayer.manager.MusicManager;
 import com.turing.musicplayer.util.Constants;
 
 import android.app.Service;
 import android.content.Intent;
-import android.media.AudioManager;
+import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 /**
  *
  *	Author: ZhangDanJiang
@@ -32,6 +33,12 @@ public class MusicService extends Service{
 	
 	private MediaPlayer mediaPlayer;
 
+	private MusicBroadCastReceiver mMusicBroadCastReceiver;
+	/**
+	 * 播放的位置
+	 */
+	private int postion = 0;
+
 	@Override
 	public IBinder onBind(Intent intent) {
 		
@@ -43,12 +50,17 @@ public class MusicService extends Service{
 	public void onCreate() {
 		super.onCreate();
 		Log.d(TAG, "onCreate .." );
+		mMusicBroadCastReceiver = new MusicBroadCastReceiver();
+		registerBroadCast();
+	    
 		if (mediaPlayer == null) {
 			mediaPlayer = new MediaPlayer();
-			mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-			mediaPlayer.setLooping(false);
+//			mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+//			mediaPlayer.setLooping(false);
 		}
 	}
+
+	
 	
 	@Override
 	public void onStart(Intent intent, int startId) {
@@ -67,10 +79,22 @@ public class MusicService extends Service{
 //				if (eventId != 0) {
 //					play();
 //				}
-				String state = bundle.getString("state");
-				int function = bundle.getInt("function");
-				if (function == 0) {
-					 play();
+				int option = bundle.getInt("option", -1);
+				
+				switch (option) {
+				case MusicConstantValue.OPTION_PLAY:
+					String url = bundle.getString("url");
+					play(url);
+					MusicManager.PLAYSTATE = option;
+					break;
+				case MusicConstantValue.OPTION_PAUSE:	
+					pause();
+					MusicManager.PLAYSTATE = option;
+					break;
+				case MusicConstantValue.OPTION_CONTINUE:	
+					cuntinue();
+					MusicManager.PLAYSTATE = option;
+					break;
 				}
 				
 			}
@@ -79,29 +103,38 @@ public class MusicService extends Service{
 	
 	
 	
-
-	public void play() {
-//		try {
-//
-//			mediaPlayer.reset();
-//			mediaPlayer.setDataSource(musicList.get(curMusic).getUrl());
-//			mediaPlayer.prepare();
-//			
-//		} catch (IllegalArgumentException e) {
-//			e.printStackTrace();
-//		} catch (IllegalStateException e) {
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
+	/**
+	 * 继续播放
+	 */
+	private void cuntinue() {
 		
-		
-//		if (!mediaPlayer.isPlaying()) {
-//			mediaPlayer.start();
-//		}
 	}
-
-	public void pause() {
+	/**
+	 * 开始播放
+	 * @param url
+	 */
+	private void play(String url) {
+			try {
+				mediaPlayer.reset();
+				mediaPlayer.setDataSource(url);
+				mediaPlayer.prepare();
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (SecurityException e) {
+				e.printStackTrace();
+			} catch (IllegalStateException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		if (!mediaPlayer.isPlaying()) {
+			mediaPlayer.start();
+		}
+	}
+	/**
+	 * 暂停播放
+	 */
+	private void pause() {
 		if (mediaPlayer != null && mediaPlayer.isPlaying()) {
 			mediaPlayer.pause();
 		}
@@ -117,6 +150,32 @@ public class MusicService extends Service{
 			}
 		}
 	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		unRegisterBroadCast(); //取消注册
+	}
+	
+	
+	/**
+	 * 注册广播
+	 */
+	private void registerBroadCast() {
+		IntentFilter intentFilter = new IntentFilter();
+		intentFilter.addAction(MusicBroadCastReceiver.MUSIC_BROADCAST_ACTION);  
+	    this.registerReceiver(mMusicBroadCastReceiver, intentFilter);
+	}
+	
+	/**
+	 * 取消注册广播
+	 */
+	private void unRegisterBroadCast() {
+		unregisterReceiver(mMusicBroadCastReceiver);
+	}
+	
+	
+
 	
 	
 
