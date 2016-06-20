@@ -26,17 +26,17 @@ public class MusicAdapter extends CommonListAdapter<MusicBean> {
 
 	@Override
 	public int getCount() {
-		return mList.size();
+		return mList == null ? 0 : mList.size();
 	}
 
 	@Override
 	public Object getItem(int position) {
-		return mList.get(position);
+		return mList == null ? null : mList.get(position);
 	}
 
 	@Override
 	public long getItemId(int position) {
-		return position;
+		return mList == null ? 0 : position;
 	}
 
 	@Override
@@ -63,18 +63,20 @@ public class MusicAdapter extends CommonListAdapter<MusicBean> {
 
 	@Override
 	public void setList(List<MusicBean> list) {
-		if (list != null) {
+		if (mList != null) {
 			mList.clear();
 			mList.addAll(list);
 			notifyDataSetChanged();
 		}
-		
+
 	}
 
 	@Override
 	public void addList(List<MusicBean> list) {
-		mList.addAll(list);
-		notifyDataSetChanged();
+		if (mList != null) {
+			mList.addAll(list);
+			notifyDataSetChanged();
+		}
 	}
 
 	private class ViewHolder {
@@ -83,7 +85,7 @@ public class MusicAdapter extends CommonListAdapter<MusicBean> {
 		/** 事件 */
 		private TextView nTime;
 	}
-	
+
 	private String getTimeToString(long duration) {
 		int minute = (int) (duration / (1000 * 60));
 		int second = (int) ((duration / 1000) - minute * 60);

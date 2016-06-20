@@ -15,6 +15,7 @@ import android.database.Cursor;
 import android.provider.CallLog;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Log;
 
 /**
  *
@@ -213,14 +214,23 @@ public final class MusicManager {
 	 * @return List<MusicBean> 音乐列表
 	 */
 	public List<MusicBean> searchMusicWithTitleAndArtist(String title ,String artist) {
-		if (TextUtils.isEmpty(artist)) {
+		if  (TextUtils.isEmpty(title) && !TextUtils.isEmpty(artist) ) {
+			return searchMusicWithArtist(artist);
+		}
+		if  (!TextUtils.isEmpty(title) && TextUtils.isEmpty(artist) ) {
+			return searchMusicWithArtist(title);
+		}
+		if  (TextUtils.isEmpty(title) && TextUtils.isEmpty(artist) ) {
 			return null;
 		}
+		
 		// 条件语句
-		String selection = MediaStore.Audio.Media.TITLE + "=?" + MediaStore.Audio.Media.ARTIST + "=?";
+		String selection = MediaStore.Audio.Media.TITLE + "=? and " + MediaStore.Audio.Media.ARTIST + "=?";
 		// ？ 与值一一对应
 		String[] selectionArgs = { title, artist };
-		return queryMusicWithCondition(selection, selectionArgs);
+		List<MusicBean> queryMusicWithCondition = queryMusicWithCondition(selection, selectionArgs);
+		Log.d(TAG, "queryMusicWithCondition" + queryMusicWithCondition + "size" + queryMusicWithCondition.size());
+		return queryMusicWithCondition;
 	}
 	
 	

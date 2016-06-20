@@ -57,10 +57,16 @@ public class MainActivity extends Activity implements OnClickListener{
 	private List<MusicBean> nMusicList;
 	/** 音乐管理者 */
 	private MusicManager mMusicManagerInstance;
-	/** 搜索按钮 */
-	private Button mSearchButton;
-	/** 搜索文本 */
-	private EditText mSearchEditText;
+	/** 根据歌曲 搜索按钮 */
+	private Button mSearchButtonByTitle;
+	/** 根据歌手 搜索按钮 */
+	private Button mSearchButtonByArtist;
+	/** 歌手和歌曲 搜索按钮 */
+	private Button mSearchButtonAll;
+	/** 歌曲 搜索文本 */
+	private EditText mSearchEditTextTitle;
+	/** 歌手 搜索文本 */
+	private EditText mSearchEditTextArt;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +79,7 @@ public class MainActivity extends Activity implements OnClickListener{
 	}
 	
 	/**
-	 * 出事话控件
+	 * 初始化控件
 	 */
 	private void initView() {
 		mStart = (TextView) findViewById(R.id.start);           //开始
@@ -82,8 +88,13 @@ public class MainActivity extends Activity implements OnClickListener{
 		mPause = (TextView) findViewById(R.id.pause);           //暂停
 		mContinue = (TextView) findViewById(R.id.tv_continue);  //继续
 		
-		mSearchEditText = (EditText) findViewById(R.id.et_search);  //搜索
-		mSearchButton = (Button) findViewById(R.id.bt_search);  //搜索
+		mSearchEditTextTitle = (EditText) findViewById(R.id.et_search);  //搜索
+		mSearchEditTextArt = (EditText) findViewById(R.id.et_search_art);  //搜索
+		
+		
+		mSearchButtonByTitle = (Button) findViewById(R.id.bt_search_title);  //搜索
+		mSearchButtonByArtist = (Button) findViewById(R.id.bt_search_art);  //搜索
+		mSearchButtonAll = (Button) findViewById(R.id.bt_search_all);  //搜索
 		
 		mListView = (ListView) findViewById(R.id.listview);     //ListView
 	}
@@ -103,7 +114,9 @@ public class MainActivity extends Activity implements OnClickListener{
 		 // 继续
 		mContinue.setOnClickListener(this);
 		// 搜索
-		mSearchButton.setOnClickListener(this);
+		mSearchButtonByTitle.setOnClickListener(this);
+		mSearchButtonByArtist.setOnClickListener(this);
+		mSearchButtonAll.setOnClickListener(this);
 	}
 	
 	/**
@@ -112,7 +125,6 @@ public class MainActivity extends Activity implements OnClickListener{
 	private void initData() {
 		//初始化 MusicManager 
 		mMusicManagerInstance = MusicManager.getInstance(getApplicationContext());
-		
 		mMusicAdapter = new MusicAdapter(getApplicationContext()); 
 		mListView.setAdapter(mMusicAdapter);
 		initAdapterData();
@@ -152,24 +164,55 @@ public class MainActivity extends Activity implements OnClickListener{
 		case R.id.tv_continue:               // 继续
 			continuePlay();
 			break;
-		case R.id.bt_search:               // 搜索
-			searchPlay();
+		case R.id.bt_search_title:               // 搜索
+			searchPlayTitle();
+			break;
+		case R.id.bt_search_art:               // 搜索
+			searchPlayArt();
+			break;
+		case R.id.bt_search_all:               // 搜索
+			searchPlayAll();
 			break;
 		default:
 			break;
 		}
 	}
 	/**
+	 * 根据歌手 和 歌名搜索
+	 */
+	private void searchPlayAll() {
+		String title = getSearchEditText(mSearchEditTextTitle);
+		String art = getSearchEditText(mSearchEditTextArt);
+		List<MusicBean> list = mMusicManagerInstance.searchMusicWithTitleAndArtist(title, art);
+		updateList(list);
+	}
+
+	/**
 	 * 根据歌曲名字搜索
 	 */
-	private void searchPlay() {
-		String searchEditText = getSearchEditText();
-		List<MusicBean> list = mMusicManagerInstance.searchMusicWithTitle(searchEditText);
-		if (list != null  && list.size()>0) {
-			mMusicAdapter.setList(list);
-		}else{
+	private void searchPlayTitle() {
+		String title = getSearchEditText(mSearchEditTextTitle);
+		List<MusicBean> list = mMusicManagerInstance.searchMusicWithTitle(title);
+		updateList(list);
+	}
+	/**
+	 * 根据歌手搜索
+	 */
+	private void searchPlayArt() {
+		String art = getSearchEditText(mSearchEditTextArt);
+		List<MusicBean> list = mMusicManagerInstance.searchMusicWithArtist(art);
+		updateList(list);
+	}
+	
+	/**
+	 * 更新列表
+	 * @param list
+	 */
+	private void updateList(List<MusicBean> list) {
+		if (list == null  || list.size() == 0) {
 			Toast.makeText(getApplicationContext(), "列表为空", 0).show();
 		}
+		mMusicAdapter.setList(list);
 	}
 
 	/**
@@ -214,8 +257,8 @@ public class MainActivity extends Activity implements OnClickListener{
 	 * 获取搜索文本数据
 	 * @return
 	 */
-	private String getSearchEditText() {
-		return mSearchEditText.getText().toString().trim();
+	private String getSearchEditText(EditText view) {
+		return view.getText().toString().trim();
 	}
 
 	

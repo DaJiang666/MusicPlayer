@@ -1,11 +1,37 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#22888888"
+    android:orientation="vertical"
     tools:context="${relativePackage}.${activityClass}" >
 
+   
     <LinearLayout
+        android:id="@+id/ll_search_art"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#bb888888"
+        android:orientation="horizontal" >
+        
+         <EditText
+            android:id="@+id/et_search_art"
+            style="@style/styleMainText"
+            android:layout_width="0dip"
+            android:layout_height="35dip"
+            android:layout_weight="4"
+            android:hint="请输入想听的歌手名" />
+         <Button
+            android:id="@+id/bt_search_art"
+            style="@style/styleMainText"
+            android:layout_width="50dip"
+            android:layout_height="35dip"
+            android:layout_weight="1"
+            android:text="根据歌手搜索" />
+      
+    </LinearLayout>
+    
+     <LinearLayout
         android:id="@+id/ll_search"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -21,17 +47,23 @@
             android:hint="请输入想听的歌曲" />
 
         <Button
-            android:id="@+id/bt_search"
+            android:id="@+id/bt_search_title"
             style="@style/styleMainText"
             android:layout_width="50dip"
             android:layout_height="35dip"
             android:layout_weight="1"
-            android:text="搜索" />
+            android:text="根据歌曲搜索" />
     </LinearLayout>
+    
+      <Button
+            android:id="@+id/bt_search_all"
+            style="@style/styleMainText"
+            android:layout_width="match_parent"
+            android:layout_height="35dip"
+            android:text="根据歌曲和歌手搜索" />
 
     <LinearLayout
         android:id="@+id/ll_top"
-        android:layout_below="@+id/ll_search"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#bb888888"
@@ -94,4 +126,5 @@
     </ListView>
 
 
-</RelativeLayout>
+
+</LinearLayout>
