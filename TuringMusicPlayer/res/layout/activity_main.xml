@@ -61,6 +61,12 @@
             android:layout_width="match_parent"
             android:layout_height="35dip"
             android:text="根据歌曲和歌手搜索" />
+      <Button
+            android:id="@+id/play_mode"
+            style="@style/styleMainText"
+            android:layout_width="match_parent"
+            android:layout_height="35dip"
+            android:text="随机播放" />
 
     <LinearLayout
         android:id="@+id/ll_top"

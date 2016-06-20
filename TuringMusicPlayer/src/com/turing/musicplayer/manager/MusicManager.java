@@ -41,6 +41,10 @@ public final class MusicManager {
 	private Context mContext;
 	/** 音乐列表 */
 	private List<MusicBean> mLoadAllMusic;
+	
+	public static int mPalyMode = 0;
+	
+	public static String[] mMusicState = {"随机播放","全部循环","单曲循环","循环列表"};
 
 	/**
 	 * 私有构造
@@ -127,14 +131,72 @@ public final class MusicManager {
 			}
 		}
 		choiceAndStartPlay(MusicConstantValue.OPTION_PLAY);
+		
+//		switch (mPalyMode) {
+//		case 0:
+//			// 随机播放
+//			randomPlay();
+//			break;
+//		case 1:
+//			// 全部循环
+//			allLooperPlay();;
+//			break;
+//		case 2:
+//			// 单曲循环  这个是主动点击下一曲 就按主动播放  播放完成时 才按自动跳转时 为单曲循环
+//			if (flag) {
+//				singleLooperPlay();
+//			}else{
+//				allLooperPlay();
+//			}
+//			break;
+//		case 3:
+//			// 循环列表
+//			orderPlay();;
+//			break;
+//		default:
+//			break;
+//		}
 	}
 
 	/**
 	 * 播放下一首
 	 */
 	public void nextPlay() {
-		CURRENT_POSITION++; // 播放 全局的 position 加1
-		choiceAndStartPlay(MusicConstantValue.OPTION_PLAY);
+		nextPlay(false);
+	}
+	
+	/**
+	 * 
+	 * @param flag 
+	 *         是否 自动下一曲 是就播放当前 
+	 *         如果是 主动执行则 换下一曲 按列表循环加1
+	 * 
+	 */
+	public void nextPlay(boolean flag) {
+		switch (mPalyMode) {
+		case 0:
+			// 随机播放
+			randomPlay();
+			break;
+		case 1:
+			// 全部循环
+			allLooperPlay();;
+			break;
+		case 2:
+			// 单曲循环  这个是主动点击下一曲 就按主动播放  播放完成时 才按自动跳转时 为单曲循环
+			if (flag) {
+				singleLooperPlay();
+			}else{
+				allLooperPlay();
+			}
+			break;
+		case 3:
+			// 循环列表
+			orderPlay();;
+			break;
+		default:
+			break;
+		}
 	}
 
 	/**
@@ -229,7 +291,9 @@ public final class MusicManager {
 		// ？ 与值一一对应
 		String[] selectionArgs = { title, artist };
 		List<MusicBean> queryMusicWithCondition = queryMusicWithCondition(selection, selectionArgs);
-		Log.d(TAG, "queryMusicWithCondition" + queryMusicWithCondition + "size" + queryMusicWithCondition.size());
+		if (DEBUG) {
+			Log.d(TAG, "queryMusicWithCondition" + queryMusicWithCondition + "size" + queryMusicWithCondition.size());
+		}
 		return queryMusicWithCondition;
 	}
 	
@@ -312,6 +376,41 @@ public final class MusicManager {
 			}
 		}
 		return null;
+	}
+	
+
+	/**
+	 * 循环列表
+	 */
+	public void allLooperPlay() {
+		// 播放记录 加1 
+		CURRENT_POSITION ++; 
+		if (CURRENT_POSITION == mLoadAllMusic.size()) {
+			CURRENT_POSITION = 0;
+		}
+		choiceAndStartPlay(MusicConstantValue.OPTION_PLAY);
+	}
+	/**
+	 * 随机播放
+	 */
+	public void randomPlay() {
+		CURRENT_POSITION = (int) (Math.random() * mLoadAllMusic.size());
+		choiceAndStartPlay(MusicConstantValue.OPTION_PLAY);
+	}
+	/**
+	 * 顺序播放
+	 */
+	public void orderPlay() {
+		if (CURRENT_POSITION == mLoadAllMusic.size()) {
+			CURRENT_POSITION = 0;
+		}
+		pusePlay();
+	}
+	/**
+	 * 单曲循环
+	 */
+	public void singleLooperPlay() {
+		choiceAndStartPlay(MusicConstantValue.OPTION_PLAY);
 	}
 
 }

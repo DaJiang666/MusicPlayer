@@ -12,6 +12,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.text.TextUtils;
@@ -25,7 +26,7 @@ import android.util.Log;
  *  Function: 音乐服务
  *
  */
-public class MusicService extends Service{
+public class MusicService extends Service implements OnCompletionListener{
 	/** 当前类 TAG. 标示 */
 	private static final String TAG = MusicService.class.getSimpleName();
 
@@ -34,9 +35,8 @@ public class MusicService extends Service{
 	
 	private MediaPlayer mediaPlayer;
 
-	private MusicBroadCastReceiver mMusicBroadCastReceiver;
 	/**
-	 * 播放音乐记住当前的位置
+	 * 记住音乐当前的播放位置
 	 */
 	private int currentPosition = 0;
 
@@ -53,13 +53,13 @@ public class MusicService extends Service{
 	public void onCreate() {
 		super.onCreate();
 		Log.d(TAG, "onCreate .." );
-		mMusicBroadCastReceiver = new MusicBroadCastReceiver();
-		registerBroadCast();
+		
 	    
 		if (mediaPlayer == null) {
 			mediaPlayer = new MediaPlayer();
 //			mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-//			mediaPlayer.setLooping(false);
+			mediaPlayer.setLooping(false);  // 不重复播放
+			mediaPlayer.setOnCompletionListener(this); //监听是否完成
 		}
 	}
 
@@ -157,7 +157,10 @@ public class MusicService extends Service{
 			mediaPlayer.pause();
 		}
 	}
-
+	
+	/**
+	 * 停止播放
+	 */
 	public void stop() {
 		if (mediaPlayer != null) {
 			mediaPlayer.stop();
@@ -168,29 +171,31 @@ public class MusicService extends Service{
 			}
 		}
 	}
-
+	
+	/**
+	 * 播放完成
+	 */
 	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		unRegisterBroadCast(); //取消注册
-	}
-	
-	
-	/**
-	 * 注册广播
-	 */
-	private void registerBroadCast() {
-		IntentFilter intentFilter = new IntentFilter();
-		intentFilter.addAction(MusicBroadCastReceiver.MUSIC_BROADCAST_ACTION);  
-	    this.registerReceiver(mMusicBroadCastReceiver, intentFilter);
+	public void onCompletion(MediaPlayer media) {
+		sendBroadCast();
 	}
 	
 	/**
-	 * 取消注册广播
+	 * 发送完成
 	 */
-	private void unRegisterBroadCast() {
-		unregisterReceiver(mMusicBroadCastReceiver);
+	private void sendBroadCast() {
+		Intent intent = new Intent();
+		intent.setAction(MusicBroadCastReceiver.MUSIC_BROADCAST_ACTION);
+		sendBroadcast(intent);
 	}
+
+	
+
+	
+
+	
+	
+
 	
 	
 

@@ -14,6 +14,7 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.view.Menu;
@@ -63,10 +64,15 @@ public class MainActivity extends Activity implements OnClickListener{
 	private Button mSearchButtonByArtist;
 	/** 歌手和歌曲 搜索按钮 */
 	private Button mSearchButtonAll;
+	/** 播放模式 */
+	private Button mPalyModeButton;
 	/** 歌曲 搜索文本 */
 	private EditText mSearchEditTextTitle;
 	/** 歌手 搜索文本 */
 	private EditText mSearchEditTextArt;
+	
+	private MusicBroadCastReceiver mMusicBroadCastReceiver;
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +102,8 @@ public class MainActivity extends Activity implements OnClickListener{
 		mSearchButtonByArtist = (Button) findViewById(R.id.bt_search_art);  //搜索
 		mSearchButtonAll = (Button) findViewById(R.id.bt_search_all);  //搜索
 		
+		mPalyModeButton = (Button) findViewById(R.id.play_mode);  // 播放模式
+		
 		mListView = (ListView) findViewById(R.id.listview);     //ListView
 	}
 
@@ -117,14 +125,19 @@ public class MainActivity extends Activity implements OnClickListener{
 		mSearchButtonByTitle.setOnClickListener(this);
 		mSearchButtonByArtist.setOnClickListener(this);
 		mSearchButtonAll.setOnClickListener(this);
+		mPalyModeButton.setOnClickListener(this);
+		
 	}
 	
 	/**
 	 * 初始化数据
 	 */
 	private void initData() {
-		//初始化 MusicManager 
 		mMusicManagerInstance = MusicManager.getInstance(getApplicationContext());
+		mMusicBroadCastReceiver = new MusicBroadCastReceiver();
+		
+		registerBroadCast();
+		//初始化 MusicManager 
 		mMusicAdapter = new MusicAdapter(getApplicationContext()); 
 		mListView.setAdapter(mMusicAdapter);
 		initAdapterData();
@@ -173,10 +186,37 @@ public class MainActivity extends Activity implements OnClickListener{
 		case R.id.bt_search_all:               // 搜索
 			searchPlayAll();
 			break;
+		case R.id.play_mode:               // 搜索
+			selectCurrentMode();
+			break;
 		default:
 			break;
 		}
 	}
+	
+	private void selectCurrentMode() {
+		MusicManager.mPalyMode ++ ;
+		if (MusicManager.mPalyMode >= MusicManager.mMusicState.length) {
+			MusicManager.mPalyMode = 0;
+		}
+		switch (MusicManager.mPalyMode) {
+		case 0:
+			mPalyModeButton.setText(MusicManager.mMusicState[0]);
+			break;
+		case 1:
+			mPalyModeButton.setText(MusicManager.mMusicState[1]);
+			break;
+		case 2:
+			mPalyModeButton.setText(MusicManager.mMusicState[2]);
+			break;
+		case 3:
+			mPalyModeButton.setText(MusicManager.mMusicState[3]);
+			break;
+		default:
+			break;
+		}
+	}
+
 	/**
 	 * 根据歌手 和 歌名搜索
 	 */
@@ -260,52 +300,28 @@ public class MainActivity extends Activity implements OnClickListener{
 	private String getSearchEditText(EditText view) {
 		return view.getText().toString().trim();
 	}
-
+	
+	/**
+	 * 注册广播
+	 */
+	private void registerBroadCast() {
+		IntentFilter intentFilter = new IntentFilter();
+		intentFilter.addAction(MusicBroadCastReceiver.MUSIC_BROADCAST_ACTION);  
+	    this.registerReceiver(mMusicBroadCastReceiver, intentFilter);
+	}
 	
 
 
-	
-	
-	
+	@Override
+	protected void onDestroy() {
+		// TODO Auto-generated method stub
+		super.onDestroy();
+		// 取消注册广播
+		unregisterReceiver(mMusicBroadCastReceiver);
+	}
 	
 
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-//	private void startPlayService(Music music, int option) {
-//		Intent intent = new Intent(getApplicationContext(), MediaService.class);
-//		if (music != null) {
-//			intent.putExtra("file", music.getPath());
-//		}
-//		intent.putExtra("option", option);
-//		startService(intent);
-//	}
-	
-//	/**
-//	 * 开始随机播放
-//	 */
-//	private void startPlay() {
-//		Intent intent = new Intent();
-//		intent.setAction(MusicBroadCastReceiver.MUSIC_BROADCAST_ACTION);
-//		intent.putExtra("state", "next");
-//		sendBroadcast(intent);
-//	}
+
 
 	
 	
