@@ -6,67 +6,92 @@
     tools:context="${relativePackage}.${activityClass}" >
 
     <LinearLayout
-        android:id="@+id/ll_top"
+        android:id="@+id/ll_search"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="#bb888888" >
+        android:background="#bb888888"
+        android:orientation="horizontal" >
+        
+         <EditText
+            android:id="@+id/et_search"
+            style="@style/styleMainText"
+            android:layout_width="0dip"
+            android:layout_height="35dip"
+            android:layout_weight="4"
+            android:hint="请输入想听的歌曲" />
+
+        <Button
+            android:id="@+id/bt_search"
+            style="@style/styleMainText"
+            android:layout_width="50dip"
+            android:layout_height="35dip"
+            android:layout_weight="1"
+            android:text="搜索" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_top"
+        android:layout_below="@+id/ll_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#bb888888"
+        android:orientation="horizontal" >
 
         <TextView
             android:id="@+id/start"
             style="@style/styleMainText"
             android:layout_width="0dip"
-            android:layout_weight="1"
             android:layout_height="35dip"
+            android:layout_weight="1"
             android:text="启动" />
-        
+
         <TextView
             android:id="@+id/pause"
             style="@style/styleMainText"
             android:layout_width="0dip"
-            android:layout_weight="1"
             android:layout_height="35dip"
+            android:layout_weight="1"
             android:text="暂停" />
-        
 
         <TextView
             android:id="@+id/previous"
             style="@style/styleMainText"
             android:layout_width="0dip"
-            android:layout_weight="1"
             android:layout_height="35dip"
+            android:layout_weight="1"
             android:text="上一首" />
-        
+
         <TextView
             android:id="@+id/next"
             style="@style/styleMainText"
             android:layout_width="0dip"
-            android:layout_weight="1"
             android:layout_height="35dip"
+            android:layout_weight="1"
             android:text="下一首" />
-        
+
         <TextView
             android:id="@+id/stop"
             style="@style/styleMainText"
             android:layout_width="0dip"
-            android:layout_weight="1"
             android:layout_height="35dip"
+            android:layout_weight="1"
             android:text="停止" />
-        
-         <TextView
+
+        <TextView
             android:id="@+id/tv_continue"
             style="@style/styleMainText"
             android:layout_width="0dip"
-            android:layout_weight="1"
             android:layout_height="35dip"
+            android:layout_weight="1"
             android:text="继续" />
     </LinearLayout>
-    
-    <ListView 
-        android:layout_below="@+id/ll_top"
+
+    <ListView
         android:id="@+id/listview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        ></ListView>
+        android:layout_below="@+id/ll_top" >
+    </ListView>
+
 
 </RelativeLayout>

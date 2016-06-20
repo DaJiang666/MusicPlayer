@@ -1,6 +1,7 @@
 package com.turing.musicplayer.adapter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.turing.musicplayer.R;
@@ -53,7 +54,7 @@ public class MusicAdapter extends CommonListAdapter<MusicBean> {
 
 		MusicBean musicBean = mList.get(position);
 		if (musicBean != null) {
-			viewHolder.nTitle.setText(musicBean.getName());
+			viewHolder.nTitle.setText(musicBean.getTitle());
 			long nDuration = musicBean.getDuration();
 			viewHolder.nTime.setText(getTimeToString(nDuration));
 		}
@@ -62,9 +63,12 @@ public class MusicAdapter extends CommonListAdapter<MusicBean> {
 
 	@Override
 	public void setList(List<MusicBean> list) {
-		mList.clear();
-		mList.addAll(list);
-		notifyDataSetChanged();
+		if (list != null) {
+			mList.clear();
+			mList.addAll(list);
+			notifyDataSetChanged();
+		}
+		
 	}
 
 	@Override

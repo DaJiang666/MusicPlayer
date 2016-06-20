@@ -15,10 +15,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.EditTextPreference;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,12 +49,18 @@ public class MainActivity extends Activity implements OnClickListener{
 	/** 继续 */
 	private TextView mContinue;
 	
-	/** 音乐ListView列表 */
+	/** 音乐ListView */
 	private ListView mListView;
 	/** 音乐适配器 */
 	private MusicAdapter mMusicAdapter;
+	/** 音乐列表 */
 	private List<MusicBean> nMusicList;
+	/** 音乐管理者 */
 	private MusicManager mMusicManagerInstance;
+	/** 搜索按钮 */
+	private Button mSearchButton;
+	/** 搜索文本 */
+	private EditText mSearchEditText;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +82,9 @@ public class MainActivity extends Activity implements OnClickListener{
 		mPause = (TextView) findViewById(R.id.pause);           //暂停
 		mContinue = (TextView) findViewById(R.id.tv_continue);  //继续
 		
+		mSearchEditText = (EditText) findViewById(R.id.et_search);  //搜索
+		mSearchButton = (Button) findViewById(R.id.bt_search);  //搜索
+		
 		mListView = (ListView) findViewById(R.id.listview);     //ListView
 	}
 
@@ -90,6 +102,8 @@ public class MainActivity extends Activity implements OnClickListener{
 		mPause.setOnClickListener(this); 
 		 // 继续
 		mContinue.setOnClickListener(this);
+		// 搜索
+		mSearchButton.setOnClickListener(this);
 	}
 	
 	/**
@@ -102,7 +116,9 @@ public class MainActivity extends Activity implements OnClickListener{
 		mMusicAdapter = new MusicAdapter(getApplicationContext()); 
 		mListView.setAdapter(mMusicAdapter);
 		initAdapterData();
+		
 	}
+	
 	/**
 	 * 为Adapter添加数据
 	 */
@@ -136,11 +152,26 @@ public class MainActivity extends Activity implements OnClickListener{
 		case R.id.tv_continue:               // 继续
 			continuePlay();
 			break;
+		case R.id.bt_search:               // 搜索
+			searchPlay();
+			break;
 		default:
 			break;
 		}
 	}
-	
+	/**
+	 * 根据歌曲名字搜索
+	 */
+	private void searchPlay() {
+		String searchEditText = getSearchEditText();
+		List<MusicBean> list = mMusicManagerInstance.searchMusicWithTitle(searchEditText);
+		if (list != null  && list.size()>0) {
+			mMusicAdapter.setList(list);
+		}else{
+			Toast.makeText(getApplicationContext(), "列表为空", 0).show();
+		}
+	}
+
 	/**
 	 * 开始播放
 	 */
@@ -179,7 +210,13 @@ public class MainActivity extends Activity implements OnClickListener{
 		mMusicManagerInstance.nextPlay();
 	}
 
-	
+	/**
+	 * 获取搜索文本数据
+	 * @return
+	 */
+	private String getSearchEditText() {
+		return mSearchEditText.getText().toString().trim();
+	}
 
 	
 
