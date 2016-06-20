@@ -101,13 +101,18 @@ public class MainActivity extends Activity implements OnClickListener{
 		
 		mMusicAdapter = new MusicAdapter(getApplicationContext()); 
 		mListView.setAdapter(mMusicAdapter);
+		initAdapterData();
+	}
+	/**
+	 * 为Adapter添加数据
+	 */
+	private void initAdapterData() {
 		nMusicList = mMusicManagerInstance.getmLoadAllMusic();
 		if (nMusicList != null && nMusicList.size() > 0) {
 			mMusicAdapter.setList(nMusicList);
 		}else{
 			Toast.makeText(getApplicationContext(), "歌曲个数" + nMusicList.size(), 0).show();
 		}
-		
 	}
 
 	/**
