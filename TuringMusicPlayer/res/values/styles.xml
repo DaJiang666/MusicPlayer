@@ -18,7 +18,7 @@
     </style>
 
     <style name="styleMainText" >
-        <item name="android:background">#6600ff00</item>
+        <item name="android:background">@drawable/button_main_selecct</item>
         <item name="android:gravity">center</item>
         <item name="android:textSize">15dip</item>
         <item name="android:layout_margin">3dip</item>

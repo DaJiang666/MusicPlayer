@@ -37,6 +37,8 @@ public class MainActivity extends Activity implements OnClickListener{
 	
 	/** 开始 */
 	private TextView mStart;
+	/** 上一曲 */
+	private TextView mPrevious;
 	/** 下一曲 */
 	private TextView mNext;
 	/** 暂停 */
@@ -49,6 +51,7 @@ public class MainActivity extends Activity implements OnClickListener{
 	/** 音乐适配器 */
 	private MusicAdapter mMusicAdapter;
 	private List<MusicBean> nMusicList;
+	private MusicManager mMusicManagerInstance;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -64,10 +67,11 @@ public class MainActivity extends Activity implements OnClickListener{
 	 * 出事话控件
 	 */
 	private void initView() {
-		mStart = (TextView) findViewById(R.id.start);   //开始
-		mNext = (TextView) findViewById(R.id.next);     //下一曲
-		mPause = (TextView) findViewById(R.id.pause);     //暂停
-		mContinue = (TextView) findViewById(R.id.tv_continue);     //暂停
+		mStart = (TextView) findViewById(R.id.start);           //开始
+		mPrevious = (TextView) findViewById(R.id.previous);     //上一曲
+		mNext = (TextView) findViewById(R.id.next);             //下一曲
+		mPause = (TextView) findViewById(R.id.pause);           //暂停
+		mContinue = (TextView) findViewById(R.id.tv_continue);  //继续
 		
 		mListView = (ListView) findViewById(R.id.listview);     //ListView
 	}
@@ -76,19 +80,28 @@ public class MainActivity extends Activity implements OnClickListener{
 	 * 对控件注册点击事件
 	 */
 	private void initSetListener() {
-		mStart.setOnClickListener(this);               //开始 
-		mNext.setOnClickListener(this);                //下一曲
-		mPause.setOnClickListener(this);                //下一曲
-		mContinue.setOnClickListener(this);                //下一曲
+		 // 开始
+		mStart.setOnClickListener(this);
+		 // 上一曲
+		mPrevious.setOnClickListener(this);
+		// 下一曲
+		mNext.setOnClickListener(this); 
+		// 暂停
+		mPause.setOnClickListener(this); 
+		 // 继续
+		mContinue.setOnClickListener(this);
 	}
 	
 	/**
 	 * 初始化数据
 	 */
 	private void initData() {
+		//初始化 MusicManager 
+		mMusicManagerInstance = MusicManager.getInstance(getApplicationContext());
+		
 		mMusicAdapter = new MusicAdapter(getApplicationContext()); 
 		mListView.setAdapter(mMusicAdapter);
-		nMusicList = MusicManager.getInstance(getApplicationContext()).loadAllMusic();
+		nMusicList = mMusicManagerInstance.getmLoadAllMusic();
 		if (nMusicList != null && nMusicList.size() > 0) {
 			mMusicAdapter.setList(nMusicList);
 		}else{
@@ -106,32 +119,29 @@ public class MainActivity extends Activity implements OnClickListener{
 		case R.id.start:               // 播放
 			startPlay();
 			break;
+		case R.id.previous:                // 上一首
+			prePlay();
+			break;
 		case R.id.next:                // 下一首
 			nextPlay();
 			break;
 		case R.id.pause:               // 暂停
 			pusePlay();
 			break;
-		case R.id.tv_continue:               // 暂停
+		case R.id.tv_continue:               // 继续
 			continuePlay();
 			break;
 		default:
 			break;
 		}
 	}
-	/**
-	 * 继续播放
-	 */
-	private void continuePlay() {
-		choiceAndStartPlay(MusicConstantValue.OPTION_CONTINUE);
-	}
-
+	
 	/**
 	 * 开始播放
 	 */
 	private void startPlay() {
 		// OPTION_PLAY 播放状态
-		choiceAndStartPlay(MusicConstantValue.OPTION_PLAY);
+		mMusicManagerInstance.startPlay();
 	}
 
 	/**
@@ -139,37 +149,41 @@ public class MainActivity extends Activity implements OnClickListener{
 	 */
 	private void pusePlay() {
 		// OPTION_PAUSE 设置暂停状态
-		startMusicService(null, MusicConstantValue.OPTION_PAUSE);
+		mMusicManagerInstance.pusePlay();
 	}
-
+	
+	/**
+	 * 继续播放
+	 */
+	private void continuePlay() {
+		mMusicManagerInstance.continuePlay();
+	}
+	
+	/**
+	 * 上一首
+	 */
+	private void prePlay() {
+		//大于0
+		mMusicManagerInstance.previousPlay();
+	}
+	
 	/**
 	 * 播放下一首
 	 */
 	private void nextPlay() {
-		MusicManager.CURRENTPOS++;  // 全局播放状态加1
-		choiceAndStartPlay(MusicConstantValue.OPTION_PLAY);
+		mMusicManagerInstance.nextPlay();
 	}
+
 	
-	/**
-	 * 选择播放的音乐  选择其中的一个
-	 */
-	private void choiceAndStartPlay(int option) {
-		if (nMusicList != null && nMusicList.size() > MusicManager.CURRENTPOS) {
-			MusicBean musicBean = nMusicList.get(MusicManager.CURRENTPOS);
-			String url = musicBean.getUrl();
-			startMusicService(url, option);
-		}
-	}
+
+	
+
+
 	
 	
-	private void startMusicService(String url, int option) {
-		Intent intent = new Intent(this, MusicService.class);
-		if (url != null) {
-			intent.putExtra("url", url);
-		}
-		intent.putExtra("option", option);
-		startService(intent);
-	}
+	
+	
+
 	
 	
 	

@@ -5,10 +5,12 @@ import java.util.List;
 
 import com.turing.musicplayer.interfaces.MusicConstantValue;
 import com.turing.musicplayer.model.MusicBean;
+import com.turing.musicplayer.service.MusicService;
 import com.turing.musicplayer.util.Constants;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.provider.CallLog;
 import android.provider.MediaStore;
@@ -20,7 +22,7 @@ import android.provider.MediaStore;
  * Date:2016年6月16日 Time: 下午2:12:43
  *
  * Function: 音乐的管理者
- *
+ * 控制音乐的播放 暂停 继续 上一曲 下一曲 和 搜素
  */
 public final class MusicManager {
 	
@@ -29,19 +31,22 @@ public final class MusicManager {
 	/** TAG */
 	private static final String TAG = "MusicManager";
 	/** 当前播放的位置  */
-	public static int CURRENTPOS = 0;
+	public static int CURRENT_POSITION = 0;
 	/** 当前音乐播放的状态  */
-	public static int PLAYSTATE = MusicConstantValue.OPTION_PAUSE;
+	public static int PLAY_STATE = MusicConstantValue.OPTION_PAUSE;
 	/** 单例 */
 	private static MusicManager instance = null;
 	/** Context */
 	private Context mContext;
+	/** 音乐列表  */
+	private List<MusicBean> mLoadAllMusic;
 
 	/**
 	 * 私有构造
 	 */
 	private MusicManager(Context context) {
 		mContext = context;
+		mLoadAllMusic = loadAllMusic();
 	}
 
 	/**
@@ -64,7 +69,7 @@ public final class MusicManager {
 	 * 加载所有的音乐
 	 * @return  List<MusicBean> 音乐列表 
 	 */
-	public List<MusicBean> loadAllMusic() {
+	private List<MusicBean> loadAllMusic() {
 		ContentResolver resolver = mContext.getContentResolver();
 		Cursor cursor = null;
 		try {
@@ -123,6 +128,88 @@ public final class MusicManager {
 	 */
 	private boolean isFit(long duration) {
 		return duration >= 1000 && duration <= 900000;
+	}
+	
+	/**
+	 * 开始播放
+	 */
+	public void startPlay() {
+		// OPTION_PLAY 播放状态
+		choiceAndStartPlay(MusicConstantValue.OPTION_PLAY);
+	}
+	
+	/**
+	 * 暂停播放
+	 */
+	public void pusePlay() {
+		// OPTION_PAUSE 设置暂停状态
+		startMusicService(null, MusicConstantValue.OPTION_PAUSE);
+	}
+	
+	/**
+	 * 继续播放
+	 */
+	public void continuePlay() {
+		// OPTION_CONTINUE 继续播放状态
+		choiceAndStartPlay(MusicConstantValue.OPTION_CONTINUE);
+	}
+	
+	
+	/**
+	 * 上一首
+	 */
+	public void previousPlay() {
+		if (CURRENT_POSITION > 0) {
+			CURRENT_POSITION--;  // 全局播放状态加1
+		}else{
+			List<MusicBean> nMusicList = loadAllMusic();
+			if (nMusicList != null && nMusicList.size() > 0) {
+				CURRENT_POSITION = nMusicList.size();
+			}
+		}
+		choiceAndStartPlay(MusicConstantValue.OPTION_PLAY);
+	}
+
+	/**
+	 * 播放下一首
+	 */
+	public void nextPlay() {
+		CURRENT_POSITION++;  // 播放 全局的 position 加1
+		choiceAndStartPlay(MusicConstantValue.OPTION_PLAY);
+	}
+
+	
+	/**
+	 * 选择播放的音乐  选择其中的一个
+	 * MusicManager.CURRENTPOS 当前的位置
+	 */
+	private void choiceAndStartPlay(int option) {
+		if (mLoadAllMusic != null && mLoadAllMusic.size() > CURRENT_POSITION) {
+			MusicBean musicBean = mLoadAllMusic.get(CURRENT_POSITION);
+			String url = musicBean.getUrl();
+			startMusicService(url, option);
+		}
+	}
+	
+	private void startMusicService(String url, int option) {
+		Intent intent = new Intent(mContext, MusicService.class);
+		if (url != null) {
+			intent.putExtra("url", url);
+		}
+		intent.putExtra("option", option);
+		mContext.startService(intent);
+	}
+	
+	/**
+	 * 获取音乐列表
+	 * @return
+	 */
+	public List<MusicBean> getmLoadAllMusic() {
+		return mLoadAllMusic;
+	}
+
+	public void setmLoadAllMusic(List<MusicBean> mLoadAllMusic) {
+		this.mLoadAllMusic = mLoadAllMusic;
 	}
 
 	

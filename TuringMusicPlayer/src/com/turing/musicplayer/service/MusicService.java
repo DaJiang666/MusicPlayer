@@ -14,6 +14,7 @@ import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.text.TextUtils;
 import android.util.Log;
 /**
  *
@@ -35,9 +36,11 @@ public class MusicService extends Service{
 
 	private MusicBroadCastReceiver mMusicBroadCastReceiver;
 	/**
-	 * 播放的位置
+	 * 播放音乐记住当前的位置
 	 */
-	private int postion = 0;
+	private int currentPosition = 0;
+
+	private String mUrl;
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -83,17 +86,21 @@ public class MusicService extends Service{
 				
 				switch (option) {
 				case MusicConstantValue.OPTION_PLAY:
-					String url = bundle.getString("url");
-					play(url);
-					MusicManager.PLAYSTATE = option;
+					mUrl = bundle.getString("url");
+					play(mUrl);
+					MusicManager.PLAY_STATE = option;
 					break;
 				case MusicConstantValue.OPTION_PAUSE:	
 					pause();
-					MusicManager.PLAYSTATE = option;
+					MusicManager.PLAY_STATE = option;
 					break;
-				case MusicConstantValue.OPTION_CONTINUE:	
+				case MusicConstantValue.OPTION_CONTINUE:
+					if (!TextUtils.isEmpty(mUrl)) {
+						mUrl = bundle.getString("url");
+						play(mUrl);
+					}
 					cuntinue();
-					MusicManager.PLAYSTATE = option;
+					MusicManager.PLAY_STATE = option;
 					break;
 				}
 				
@@ -107,13 +114,23 @@ public class MusicService extends Service{
 	 * 继续播放
 	 */
 	private void cuntinue() {
-		
+		playerToPosiztion(currentPosition);
 	}
+	
+	private void playerToPosiztion(int posiztion) {
+		if (posiztion > 0 && posiztion < mediaPlayer.getDuration()) {
+			mediaPlayer.seekTo(posiztion);
+		}		
+	}
+
 	/**
 	 * 开始播放
 	 * @param url
 	 */
 	private void play(String url) {
+		if (mediaPlayer == null) {
+			mediaPlayer = new MediaPlayer();
+		}
 			try {
 				mediaPlayer.reset();
 				mediaPlayer.setDataSource(url);
@@ -129,12 +146,13 @@ public class MusicService extends Service{
 			}
 		if (!mediaPlayer.isPlaying()) {
 			mediaPlayer.start();
-		}
+		}	
 	}
 	/**
 	 * 暂停播放
 	 */
 	private void pause() {
+		currentPosition = mediaPlayer.getCurrentPosition();
 		if (mediaPlayer != null && mediaPlayer.isPlaying()) {
 			mediaPlayer.pause();
 		}
