@@ -102,6 +102,11 @@ public class MusicService extends Service implements OnCompletionListener{
 					cuntinue();
 					MusicManager.PLAY_STATE = option;
 					break;
+				case MusicConstantValue.OPTION_STOP:
+					// 停止播放
+					stop();
+					MusicManager.PLAY_STATE = option;
+					break;
 				}
 				
 			}
@@ -117,6 +122,10 @@ public class MusicService extends Service implements OnCompletionListener{
 		playerToPosiztion(currentPosition);
 	}
 	
+	/**
+	 * 继续从原来的位置播放
+	 * @param posiztion
+	 */
 	private void playerToPosiztion(int posiztion) {
 		if (posiztion > 0 && posiztion < mediaPlayer.getDuration()) {
 			mediaPlayer.seekTo(posiztion);
@@ -177,6 +186,9 @@ public class MusicService extends Service implements OnCompletionListener{
 	 */
 	@Override
 	public void onCompletion(MediaPlayer media) {
+		if (DEBUG) {
+			Log.d(TAG, "onCompletion 播放完成");
+		}
 		sendBroadCast();
 	}
 	
@@ -188,18 +200,5 @@ public class MusicService extends Service implements OnCompletionListener{
 		intent.setAction(MusicBroadCastReceiver.MUSIC_BROADCAST_ACTION);
 		sendBroadcast(intent);
 	}
-
-	
-
-	
-
-	
-	
-
-	
-	
-
-	
-	
 
 }

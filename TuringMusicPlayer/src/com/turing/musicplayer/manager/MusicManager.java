@@ -39,12 +39,14 @@ public final class MusicManager {
 	private static MusicManager instance = null;
 	/** Context */
 	private Context mContext;
-	/** 音乐列表 */
+	/** 音乐总列表 */
 	private List<MusicBean> mLoadAllMusic;
-	
+	/** 音乐当前列表 */
+	private List<MusicBean> mLoadCurrentMusic;
+
 	public static int mPalyMode = 0;
-	
-	public static String[] mMusicState = {"随机播放","全部循环","单曲循环","循环列表"};
+
+	public static String[] mMusicState = { "全部循环", "单曲循环" };
 
 	/**
 	 * 私有构造
@@ -52,6 +54,7 @@ public final class MusicManager {
 	private MusicManager(Context context) {
 		mContext = context;
 		mLoadAllMusic = loadAllMusic();
+		mLoadCurrentMusic = mLoadAllMusic;
 	}
 
 	/**
@@ -117,11 +120,18 @@ public final class MusicManager {
 		// OPTION_CONTINUE 继续播放状态
 		choiceAndStartPlay(MusicConstantValue.OPTION_CONTINUE);
 	}
+	/**
+	 * 停止播放
+	 */
+	public void stopPaly(){
+		choiceAndStartPlay(MusicConstantValue.OPTION_STOP);
+	}
 
 	/**
 	 * 上一首
 	 */
 	public void previousPlay() {
+		// 循环列表
 		if (CURRENT_POSITION > 0) {
 			CURRENT_POSITION--; // 全局播放状态加1
 		} else {
@@ -131,31 +141,6 @@ public final class MusicManager {
 			}
 		}
 		choiceAndStartPlay(MusicConstantValue.OPTION_PLAY);
-		
-//		switch (mPalyMode) {
-//		case 0:
-//			// 随机播放
-//			randomPlay();
-//			break;
-//		case 1:
-//			// 全部循环
-//			allLooperPlay();;
-//			break;
-//		case 2:
-//			// 单曲循环  这个是主动点击下一曲 就按主动播放  播放完成时 才按自动跳转时 为单曲循环
-//			if (flag) {
-//				singleLooperPlay();
-//			}else{
-//				allLooperPlay();
-//			}
-//			break;
-//		case 3:
-//			// 循环列表
-//			orderPlay();;
-//			break;
-//		default:
-//			break;
-//		}
 	}
 
 	/**
@@ -164,35 +149,27 @@ public final class MusicManager {
 	public void nextPlay() {
 		nextPlay(false);
 	}
-	
+
 	/**
 	 * 
-	 * @param flag 
-	 *         是否 自动下一曲 是就播放当前 
-	 *         如果是 主动执行则 换下一曲 按列表循环加1
+	 * @param flag
+	 *            是否 自动下一曲 是就播放当前 如果是 主动执行则 换下一曲 按列表循环加1
 	 * 
 	 */
 	public void nextPlay(boolean flag) {
 		switch (mPalyMode) {
 		case 0:
-			// 随机播放
-			randomPlay();
+			// 全部循环
+			allLooperPlay();
 			break;
 		case 1:
-			// 全部循环
-			allLooperPlay();;
-			break;
-		case 2:
-			// 单曲循环  这个是主动点击下一曲 就按主动播放  播放完成时 才按自动跳转时 为单曲循环
+			// 单曲循环 这个是主动点击下一曲 就按主动播放 播放完成时 才按自动跳转时 为单曲循环
 			if (flag) {
 				singleLooperPlay();
-			}else{
+			} else {
+				// 主动换一首 则继续 按列表循环
 				allLooperPlay();
 			}
-			break;
-		case 3:
-			// 循环列表
-			orderPlay();;
 			break;
 		default:
 			break;
@@ -203,13 +180,35 @@ public final class MusicManager {
 	 * 选择播放的音乐 选择其中的一个 MusicManager.CURRENTPOS 当前的位置
 	 */
 	private void choiceAndStartPlay(int option) {
-		if (mLoadAllMusic != null && mLoadAllMusic.size() > CURRENT_POSITION) {
-			MusicBean musicBean = mLoadAllMusic.get(CURRENT_POSITION);
+		if (mLoadCurrentMusic != null && mLoadCurrentMusic.size() > CURRENT_POSITION) {
+			MusicBean musicBean = mLoadCurrentMusic.get(CURRENT_POSITION);
+			if (musicBean != null) {
+				if (DEBUG) {
+					Log.d(TAG, "musicBean==" + musicBean.toString());
+				}
+				String url = musicBean.getUrl();
+				startMusicService(url, option);
+			}
+		}
+	}
+
+	/**
+	 * 选择播放的音乐 选择其中的一个 MusicManager.CURRENTPOS 当前的位置
+	 */
+	private void choiceAndStartPlay(MusicBean musicBean, int option) {
+		if (musicBean != null) {
+			if (DEBUG) {
+				Log.d(TAG, "musicBean==" + musicBean.toString());
+			}
 			String url = musicBean.getUrl();
 			startMusicService(url, option);
 		}
 	}
-
+	/**
+	 * 根据播放地址 和播放状态开启服务
+	 * @param url 音乐的本地地址
+	 * @param option 音乐的播放状态  播放状态  暂停状态  
+	 */
 	private void startMusicService(String url, int option) {
 		Intent intent = new Intent(mContext, MusicService.class);
 		if (url != null) {
@@ -220,7 +219,7 @@ public final class MusicManager {
 	}
 
 	/**
-	 * 获取音乐列表
+	 * 获取音乐总列表
 	 * 
 	 * @return
 	 */
@@ -228,8 +227,22 @@ public final class MusicManager {
 		return mLoadAllMusic;
 	}
 
-	public void setmLoadAllMusic(List<MusicBean> mLoadAllMusic) {
-		this.mLoadAllMusic = mLoadAllMusic;
+	/**
+	 * 获取音乐播放当前列表
+	 * 
+	 * @return
+	 */
+	public List<MusicBean> getmLoadCurrentMusic() {
+		return mLoadCurrentMusic;
+	}
+
+	/**
+	 * 设置音乐播放当前列表
+	 * 
+	 * @param mLoadCurrentMusic
+	 */
+	public void setmLoadCurrentMusic(List<MusicBean> mLoadCurrentMusic) {
+		this.mLoadCurrentMusic = mLoadCurrentMusic;
 	}
 
 	/**
@@ -247,9 +260,10 @@ public final class MusicManager {
 		String selection = MediaStore.Audio.Media.TITLE + "=?";
 		// ？ 与值一一对应
 		String[] selectionArgs = { title };
-		return queryMusicWithCondition(selection, selectionArgs);
+		List<MusicBean> queryMusicWithCondition = queryMusicWithCondition(selection, selectionArgs);
+		return handleList(queryMusicWithCondition);
 	}
-	
+
 	/**
 	 * 根据歌手 艺术家 进行搜索
 	 * 
@@ -265,9 +279,47 @@ public final class MusicManager {
 		String selection = MediaStore.Audio.Media.ARTIST + "=?";
 		// ？ 与值一一对应
 		String[] selectionArgs = { artist };
-		return queryMusicWithCondition(selection, selectionArgs);
+		List<MusicBean> queryMusicWithCondition = queryMusicWithCondition(selection, selectionArgs);
+
+		return handleList(queryMusicWithCondition);
 	}
-	
+
+	/**
+	 * 对获取List音乐列表进行不同的处理
+	 * 
+	 * @param list 传入的音乐列表
+	 * @return 当前音乐列表
+	 */
+	private List<MusicBean> handleList(List<MusicBean> list) {
+		if (list != null) {
+			// 如果列表不为空且 大于2 并且随机播放其中的一首
+			if (list.size() >= 2) {
+				mLoadCurrentMusic = list;
+				randomPlay();
+				// 如果 搜索到一首歌
+				return mLoadCurrentMusic;
+			} else if (list.size() == 1) {
+				MusicBean musicBean = list.get(0);
+				if (mLoadCurrentMusic.contains(musicBean)) {
+					// 获取当前的位置
+					int indexOf = mLoadCurrentMusic.indexOf(musicBean);
+					CURRENT_POSITION = indexOf;
+					// 播放当前歌曲
+					choiceAndStartPlay(musicBean, MusicConstantValue.OPTION_PLAY);
+				} else {
+					Log.d(TAG, "没有这首歌");
+				}
+				// 返回 当前列表
+				return mLoadCurrentMusic;
+			} else {
+				return list;
+			}
+		} else {
+			return null;
+		}
+
+	}
+
 	/**
 	 * 根据 歌名和歌手 进行搜索
 	 * 
@@ -275,17 +327,17 @@ public final class MusicManager {
 	 *            歌手 艺术家 名字
 	 * @return List<MusicBean> 音乐列表
 	 */
-	public List<MusicBean> searchMusicWithTitleAndArtist(String title ,String artist) {
-		if  (TextUtils.isEmpty(title) && !TextUtils.isEmpty(artist) ) {
+	public List<MusicBean> searchMusicWithTitleAndArtist(String title, String artist) {
+		if (TextUtils.isEmpty(title) && !TextUtils.isEmpty(artist)) {
 			return searchMusicWithArtist(artist);
 		}
-		if  (!TextUtils.isEmpty(title) && TextUtils.isEmpty(artist) ) {
+		if (!TextUtils.isEmpty(title) && TextUtils.isEmpty(artist)) {
 			return searchMusicWithArtist(title);
 		}
-		if  (TextUtils.isEmpty(title) && TextUtils.isEmpty(artist) ) {
+		if (TextUtils.isEmpty(title) && TextUtils.isEmpty(artist)) {
 			return null;
 		}
-		
+
 		// 条件语句
 		String selection = MediaStore.Audio.Media.TITLE + "=? and " + MediaStore.Audio.Media.ARTIST + "=?";
 		// ？ 与值一一对应
@@ -294,15 +346,17 @@ public final class MusicManager {
 		if (DEBUG) {
 			Log.d(TAG, "queryMusicWithCondition" + queryMusicWithCondition + "size" + queryMusicWithCondition.size());
 		}
-		return queryMusicWithCondition;
+
+		return handleList(queryMusicWithCondition);
 	}
-	
-	
-	
+
 	/**
 	 * 根据条件查询 信息
-	 * @param selection  查询条件
-	 * @param selectionArgs  查询参数
+	 * 
+	 * @param selection
+	 *            查询条件
+	 * @param selectionArgs
+	 *            查询参数
 	 * @return 返回音乐列表
 	 */
 	private List<MusicBean> queryMusicWithCondition(String selection, String[] selectionArgs) {
@@ -310,21 +364,13 @@ public final class MusicManager {
 		Cursor cursor = null;
 		try {
 			/** 可用可不用 */
-			String[] projection = { MediaStore.Audio.Media.DURATION, 
-					MediaStore.Audio.Media._ID,
-					MediaStore.Audio.Media.TITLE, 
-					MediaStore.Audio.Media.ARTIST, 
-					MediaStore.Audio.Media.ALBUM,
-					MediaStore.Audio.Media.ALBUM_ID, 
-					MediaStore.Audio.Media.SIZE, 
-					MediaStore.Audio.Media.DATA,
+			String[] projection = { MediaStore.Audio.Media.DURATION, MediaStore.Audio.Media._ID,
+					MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.ARTIST, MediaStore.Audio.Media.ALBUM,
+					MediaStore.Audio.Media.ALBUM_ID, MediaStore.Audio.Media.SIZE, MediaStore.Audio.Media.DATA,
 					MediaStore.Audio.Media.IS_MUSIC };
 
 			// 获取游标
-			cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, 
-					projection, 
-					selection, 
-					selectionArgs,
+			cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, projection, selection, selectionArgs,
 					MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
 			if (cursor != null) {
 				// 创建列表
@@ -377,40 +423,34 @@ public final class MusicManager {
 		}
 		return null;
 	}
-	
 
 	/**
 	 * 循环列表
 	 */
 	public void allLooperPlay() {
-		// 播放记录 加1 
-		CURRENT_POSITION ++; 
-		if (CURRENT_POSITION == mLoadAllMusic.size()) {
+		// 播放记录 加1
+		CURRENT_POSITION++;
+		if (CURRENT_POSITION == mLoadCurrentMusic.size()) {
 			CURRENT_POSITION = 0;
 		}
 		choiceAndStartPlay(MusicConstantValue.OPTION_PLAY);
 	}
-	/**
-	 * 随机播放
-	 */
-	public void randomPlay() {
-		CURRENT_POSITION = (int) (Math.random() * mLoadAllMusic.size());
-		choiceAndStartPlay(MusicConstantValue.OPTION_PLAY);
-	}
-	/**
-	 * 顺序播放
-	 */
-	public void orderPlay() {
-		if (CURRENT_POSITION == mLoadAllMusic.size()) {
-			CURRENT_POSITION = 0;
-		}
-		pusePlay();
-	}
+
 	/**
 	 * 单曲循环
 	 */
 	public void singleLooperPlay() {
 		choiceAndStartPlay(MusicConstantValue.OPTION_PLAY);
 	}
+	
+	/**
+	 * 随机播放
+	 */
+	public void randomPlay() {
+		CURRENT_POSITION = (int) (Math.random() * mLoadCurrentMusic.size());
+		choiceAndStartPlay(MusicConstantValue.OPTION_PLAY);
+	}
+	
+	
 
 }

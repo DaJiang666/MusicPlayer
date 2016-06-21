@@ -21,4 +21,8 @@ public interface MusicConstantValue {
 	 * 继续
 	 */
 	int OPTION_CONTINUE = 52;
+	/**
+	 * 停止
+	 */
+	int OPTION_STOP = 53;
 }

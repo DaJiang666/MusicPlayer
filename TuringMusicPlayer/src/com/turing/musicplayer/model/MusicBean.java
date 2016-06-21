@@ -101,4 +101,70 @@ public class MusicBean {
 		this.duration = duration;
 	}
 
+	@Override
+	public String toString() {
+		return "MusicBean [id=" + id + ", title=" + title + ", artist=" + artist + ", album=" + album + ", albumId="
+				+ albumId + ", size=" + size + ", url=" + url + ", duration=" + duration + ", isMusic=" + isMusic + "]";
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((album == null) ? 0 : album.hashCode());
+		result = prime * result + (int) (albumId ^ (albumId >>> 32));
+		result = prime * result + ((artist == null) ? 0 : artist.hashCode());
+		result = prime * result + (int) (duration ^ (duration >>> 32));
+		result = prime * result + (int) (id ^ (id >>> 32));
+		result = prime * result + isMusic;
+		result = prime * result + (int) (size ^ (size >>> 32));
+		result = prime * result + ((title == null) ? 0 : title.hashCode());
+		result = prime * result + ((url == null) ? 0 : url.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		MusicBean other = (MusicBean) obj;
+		if (album == null) {
+			if (other.album != null)
+				return false;
+		} else if (!album.equals(other.album))
+			return false;
+		if (albumId != other.albumId)
+			return false;
+		if (artist == null) {
+			if (other.artist != null)
+				return false;
+		} else if (!artist.equals(other.artist))
+			return false;
+		if (duration != other.duration)
+			return false;
+		if (id != other.id)
+			return false;
+		if (isMusic != other.isMusic)
+			return false;
+		if (size != other.size)
+			return false;
+		if (title == null) {
+			if (other.title != null)
+				return false;
+		} else if (!title.equals(other.title))
+			return false;
+		if (url == null) {
+			if (other.url != null)
+				return false;
+		} else if (!url.equals(other.url))
+			return false;
+		return true;
+	}
+	
+	
+
 }
